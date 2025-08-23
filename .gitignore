@@ -1,1 +1,34 @@
-# Exclusión de artefactos generadosgit push
+#############################################
+# Exclusión de artefactos generados - .gitignore
+# Propósito CME: Mantener la limpieza del repositorio, excluyendo
+# archivos temporales, binarios y trazas que no forman parte del
+# legado institucional.
+#Contexto: Proyecto PlantUML_Creator
+# Enfoque: Defensivo, trazable y pedagógico
+# Autor: Diego Benjumea - Redfyr
+# Última revisión: 2025-08-22
+############################################
+
+# Archivos generadospor PlantUML
+*.png
+~.svg
+
+#Logs y trazas de ejecución 
+*.Logs
+#Archivos temporales y de respaldo
+*.tmp
+*.bak
+~$*
+
+# Entorno de desarrollo (Visual Studio Code)
+.vscode/
+*.cde-workspace
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+
+# Exclusión de artefactos geneerados, no de fuente
+!*.puml
+!*.bat
+!README.md
