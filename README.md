@@ -50,6 +50,20 @@ creator.bat: El script principal del proyecto.
 
 plantuml.jar: El ejecutable de PlantUML.
 
+## *Descarga del Proyecto*
+
+Para obtener el proyecto sin necesidad de usar comandos de Git, puedes descargarlo directamente como un archivo ZIP desde GitHub.
+
+Ve a la página principal del repositorio en GitHub.
+
+Haz clic en el botón verde <> Code.
+
+En el menú desplegable, selecciona Download ZIP.
+
+Descomprime el archivo .zip en la ubicación que prefieras.
+
+Uso
+
 ## *Uso*
 
 Simplemente haz doble clic en el archivo creator.bat o ejecútalo desde la línea de comandos. El script mostrará un menú interactivo.
