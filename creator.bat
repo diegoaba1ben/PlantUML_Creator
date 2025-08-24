@@ -121,6 +121,7 @@ rem ----------------------------------------------------------------------------
 set "DIR_CODIGO=%~dp0Codigo"
 if not exist "%DIR_CODIGO%" (
     call :ManejarError DIR_CODIGO_FALTA
+    goto :EOF
 )
 
 set "archivos_a_procesar="
@@ -130,12 +131,17 @@ for /r "%DIR_CODIGO%" %%f in (*.puml) do (
 
 if not defined archivos_a_procesar (
     echo [INFO] No se encontraron archivos .puml en el directorio 'Codigo'.
+    goto :EOF
 )
+rem --- Mostrar archivos encontrados ---
+echo.
+echo [INFO] Se encontraron los siguientes archivos para renderizar:
+for %%f in (%archivos_a_procesar%) do echo   - %%~nxf
 
 goto :EOF
 
 rem ======================================================================================
-rem SUBRUTINA RENDERIZAR ARCHIVOS
+rem = SUBRUTINA: RENDERIZAR ARCHIVOS                                                      =
 rem --------------------------------------------------------------------------------------
 rem Ficha CME - SR-REN-001
 rem Propósito: Renderizar los archivos .puml encontrados en el directorio Codigo.
@@ -153,7 +159,57 @@ for %%f in (%archivos_a_procesar%) do (
 goto :EOF
 
 rem ======================================================================================
-rem SUBRUTINA DE MANEJO DE ERRORES
+rem = SUBRUTINA: RENDERIZAR SOLO NUEVOS O MODIFICADOS                                    =
+rem --------------------------------------------------------------------------------------
+rem Ficha CME - SR-REN-002 
+rem Propósito: Renderizar solo los archivos .puml que no tienen un .png correspondiente o
+rem            que han sido mofificados más recientemente que su .png
+rem Dependencias: Subrutina :RenderizarArchivos
+rem ======================================================================================
+:RenderizarNuevosOModificados
+set "DIR_CODIGO=%~dp0Codigo"
+set "OUTPUT=%~dp0output"
+
+echo.
+echo [INFO] Buscando archivos nuevos o modificados para renderizar...
+
+set "archivos_a_procesar="
+for /r "%DIR_CODIGO%" %%f in (*.puml) do (
+    set "ARCHIVO_PUML=%%f"
+    set "ARCHIVO_PNG=!DIR_SALIDA!\%%%%~nf.png"
+    if not exist "!ARVHIVO_PNG!" (
+        rem El archivo .png no existe, renderizar.
+        set "archivos_a_procesar=!archivos_a_procesar! "!ARCHIVO_PUML!""
+    ) else (
+        rem El archivo .png ya existe, comparar fechas.
+        for /f "tokens=1" %%a in ('wmic datafile where name^="!ARCHIVO_PUML:^=\\!" get LastModified /format:list') do set "fecha_puml=%%a"
+        for /f "tokens=1" %%b in ('wmic datafile where name^="!ARCHIVO_PNG:^=\\!" get LastModified /format:list') do set "fecha_png=%%b"
+        
+        if "!fecha_puml!" GTR "!fecha_png!" (
+            rem El archivo .puml es más reciente, renderizar.
+            set "archivos_a_procesar=!archivos_a_procesar! "!ARCHIVO_PUML!""
+        )
+    )
+)
+if not defined archivos_a_procesar(
+    echo [INFO] Todos los diagramas están actualizados. No hay archivos para renderizar
+) else (
+    echo.
+    echo [INFO] Se encontraron los siguientes archivos para renderizar:
+    for %%f in (%archivos_a_procesar%) do echo   - %%~nxf
+    echo.
+    set /p "CONFIRMAR=¿Deseas renderizar estos archivos? (S/N):"
+    if /I "%CONFIRMAR%"=="S" (
+        call :RenderizarArchivos
+    ) else (
+        echo [INFO] Operacion cancelada por el usuario.
+    )
+)
+pause >nul
+goto MostrarMenu
+
+rem ======================================================================================
+rem = SUBRUTINA: MANEJO DE ERRORES                                                    =
 rem --------------------------------------------------------------------------------------
 rem Ficha CME - SR-ERR-001
 rem Propósito: Centralizar el manejo de errores del script para facilitar la trazabilidad.
@@ -231,8 +287,10 @@ if not defined SEL_PREF (
     goto FiltrarMenuEstatico
 )
 
-echo.
-echo [INFO] Has seleccionado el prefijo: !SEL_PREF!.
+
+rem --- Creación del subdirectorio de salida con el nombre del prefijo ---
+set "OUTPUT_SUBDIR=%~dp0output\!SEL_PREF!"
+if not exist "%OUTPUT_SUBDIR%" mkdir "%OUTPUT_SUBDIR%"
 
 set "archivos_a_procesar="
 for /r "%~dp0Codigo" %%f in (!SEL_PREF!_*.puml) do (

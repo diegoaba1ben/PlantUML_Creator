@@ -1,6 +1,6 @@
 # **PlantUML_Creator**
 
-PlantUML_Creator es un script CLI desarrollado en PowerShell que automatiza la generación de diagramsa, figuras y tablas utilizando el lenguaje DSL (Domain-Specific-Lenguaje) de PlantUML. Un DSL es un lenguaje diseñado específicamente para describir elementos como dentro de un dominio concreto -en este caso, estructuras visuales
+PlantUML_Creator es un script CLI desarrollado en .bat que automatiza la generación de diagramsa, figuras y tablas utilizando el lenguaje DSL (Domain-Specific-Lenguaje) de PlantUML. Un DSL es un lenguaje diseñado específicamente para describir elementos como dentro de un dominio concreto -en este caso, estructuras visuales
 como clases, secuencias, flujos o componentes de software- de forma concisa y expresiva
 Este artefacto resuelve la necesidad de renderizar diagramas sin depender de extensiones nativas como las de IntelliJ IDEA, permitiendo una ejecución directa desde consola, con validación de entorno, modularidad y trazabilidad
 
@@ -91,5 +91,37 @@ evitar errores silenciosos
 - *Mantenimiento*: Ajustar rutas o comandos según actualizaciones de Java/PlantUML, versionar junto al script
 
 ---
+
+### *Menú de opciones principales*
+
+Se crea un  menú que permite al usuario acceder a las opciones básicas que ofrece el script y escoger entre
+las opciones 1 para renderizar todos los activos y la opción 2  para filtrar y renderizar por prefijo o la opción 3 para salir del script.
+
+### *Gestión defensiva de archivos*
+
+Antes de cualquier acción, el script verifica la existencia de los archivos .puml en el directorio 'codigo',
+si no encuentra ninguno, muestra un mensaje informativo y finaliza el proceso para evitar errores.
+
+### *Listado de archivos (Opción 1)*
+
+Al elegir la opción 1 (renderizar todo) el script hace un escaneo y muestra una lista detallada de todos los archivos que va a procesar.
+
+### *Renderizado por prefijo (Opción 2)*
+
+Cuando se selecciona la opción 2, el script no procesa todos los archivos de golpe, sino que permite elegir
+un grupo específico de diagramas. El proceso es el siguiente:
+
+- Menú prefijos: El script presenta una lista de prefijos predefinidos, cada prefijo corrsponde a un tipo de diagrama como, como sec para seguridad o net para redes.
+- Selección y búsqueda: Elección de la opción. El escript toma el prefijo asociado (ej: sec) y luego escanea la carpeta 'codigo'/ para encontrar todos los archivos que comiencen con ese prefijo (ej_sec-001, sec-002)
+- Creación de la carpeta de salida: Antes de renderizar, el script es lo suficientemente inteligente para
+crear una subcarpeta con el nombre del prefijo dentro del directorio de salida (output/); esto evita que los
+diagramas de diferentes categorías se mezclen, manteniendo el proyecto muy organizado (por ejemplo: output/sec, output/net)
+- Listado y confirmación: Una vez el script ha encontrado los archivos, te muestra una lista de los que va a procesar, no los renderiza de inmediato, en cambio, pregunta si se desea continuar; esto da el control total para decidir si se quiere seguir adelante o cancelar la operación y volver al menú.
+Esta funcionalidad es ideal cuando se quiere actualizar un tipo específico de diagrama sin tener que esperar a que el script renderice todo el proyecto. Es una medida defensiva que ahhorra tiempo y recursos
+
+### *Confirmación del usuario*
+
+En ambas opciones (1 y 2), el script pide una confirmación antes de iniciar el renderizado, lo que da control
+total sobre el acceso.
 
 ## Instalación (pendiente de desarrollo)
