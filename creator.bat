@@ -6,6 +6,7 @@ rem ============================================================================
 rem CME-MAIN-001: script principal de generación PlantUML con validación previa
 rem Archivo: creator.bat
 rem Propósito: Llamar a ValidarEntorno y luego generar diagramas
+rem Dependencias: Poseer plantuml.jar en el mismo directorio y Java Runtime Enviroment
 rem Entorno: Windows 11, cmd, Batch v1.0
 rem ======================================================================================
 
@@ -237,7 +238,7 @@ exit /b 1
 rem ======================================================================================
 rem SUBRUTINA FILTRAR POR PREFIJO (SUBMENU ESTÁTICO)
 rem --------------------------------------------------------------------------------------
-rem Ficha CME - SR-FIL-002
+rem Ficha CME: SR-FIL-002
 rem Propósito: Muestra un submenú interactivo basado en una tabla de prefijos estática,
 rem            permitiendo al usuario seleccionar y renderizar solo los archivos con el
 rem            prefijo elegido.
@@ -245,7 +246,7 @@ rem Entorno: Windows cmd, ejecución local.
 rem Dependencias: Subrutinas :RenderizarArchivos, :ManejarError.
 rem Autor: Diego Benjumea - Redfyr
 rem Fecha: 2025-08-23
-rem ======================================================================================
+rem =====================================================================================
 :FiltrarMenuEstatico
 cls
 echo ====================================================================================
@@ -254,21 +255,25 @@ echo ===========================================================================
 echo.
 echo [INFO] Listado de prefijos para filtrar:
 echo.
-echo 1. sec  ^| Seguridad/Ciberseguridad
-echo 2. net  ^| Redes/infraestructura
-echo 3. app  ^| Aplicaciones/desarrollo
-echo 4. aq   ^| Arquitectura MVVC
-echo 5. aqt  ^| Arquitectura MVVC
-echo 6. cu   ^| Casos de uso
-echo 7. co   ^| Clases y objetos
-echo 8. er   ^| Entidad-Relacion (Base de datos)
-echo 9. seq  ^| Secuencia/interaccion
+echo 1. sec ^| Seguridad/Ciberseguridad
+echo 2. net ^| Redes/infraestructura
+echo 3. app ^| Aplicaciones/desarrollo
+echo 4. aq  ^| Arquitectura MVVC
+echo 5. aqt ^| Arquitectura MVVC
+echo 6. cu  ^| Casos de uso
+echo 7. co  ^| Clases y objetos
+echo 8. er  ^| Entidad-Relacion (Base de datos)
+echo 9. seq ^| Secuencia/interaccion
 echo 10. cmp ^| Componentes/Modulos
 echo 11. cfg ^| Configuracion/Infra
+echo.
+echo.
+echo 0. Volver al menu principal
 echo.
 
 set /p "OPCION=Elige una opcion y presiona Enter: "
 
+if "%OPCION%"=="0" (goto MostrarMenu)
 if "%OPCION%"=="1" (set "SEL_PREF=sec")
 if "%OPCION%"=="2" (set "SEL_PREF=net")
 if "%OPCION%"=="3" (set "SEL_PREF=app")
@@ -287,26 +292,73 @@ if not defined SEL_PREF (
     goto FiltrarMenuEstatico
 )
 
-
-rem --- Creación del subdirectorio de salida con el nombre del prefijo ---
-set "OUTPUT_SUBDIR=%~dp0output\!SEL_PREF!"
-if not exist "%OUTPUT_SUBDIR%" mkdir "%OUTPUT_SUBDIR%"
+echo.
+echo [INFO] Has seleccionado el prefijo: !SEL_PREF!.
 
 set "archivos_a_procesar="
+set "archivos_no_movidos="
+rem --- Mueve los archivos a una carpeta temporal
+set "TEMP_DIR=%~dp0temp\temp_!SEL_PREF!_!DATE!_!TIME: =_!"
+rem Reemplazamos los caracteres especiales para un nombre de carpeta valido
+set "TEMP_DIR=!TEMP_DIR:/=-!"
+set "TEMP_DIR=!TEMP_DIR::=-!"
+set "TEMP_DIR=!TEMP_DIR:,=-!"
+mkdir "!TEMP_DIR!"
+
+rem --- Mover archivos a la carpeta temporal ---
 for /r "%~dp0Codigo" %%f in (!SEL_PREF!_*.puml) do (
-    set "archivos_a_procesar=!archivos_a_procesar! "%%f""
+    move "%%f" "!TEMP_DIR!"
+    if errorlevel 1 (
+        echo [ERROR] No se pudo mover el archivo "%%f".
+        set "archivos_no_movidos=true"
+    ) else (
+        set "archivos_a_procesar=!archivos_a_procesar! "!TEMP_DIR!\%%~nxf""
+    )
 )
 
 if defined archivos_a_procesar (
     echo.
-    echo [INFO] Se encontraron los siguientes archivos:
-    for %%f in (%archivos_a_procesar%) do echo   - %%~nxf
+    echo [INFO] Se encontraron los siguientes archivos para renderizar:
+    for %%f in (!archivos_a_procesar!) do echo   - %%~nxf
     echo.
-    call :RenderizarArchivos
+    set /p "CONFIRMAR=¿Desea renderizar estos archivos? (S/N): "
+    if /i "!CONFIRMAR!"=="S" (
+        rem --- Creación del subdirectorio de salida con el nombre del prefijo ---
+        set "OUTPUT_SUBDIR=%~dp0output\!SEL_PREF!"
+        if not exist "%OUTPUT_SUBDIR%" mkdir "%OUTPUT_SUBDIR%"
+        
+        call :RenderizarArchivos "!TEMP_DIR!" "!OUTPUT_SUBDIR!"
+    ) else (
+        echo [INFO] Operacion cancelada por el usuario.
+        pause >nul
+        goto MostrarMenu
+    )
 ) else (
     echo.
     echo [INFO] No se encontraron archivos para el prefijo seleccionado.
 )
 
+rem --- Llamada a la subrutina de sanitización para limpiar el temporal ---
+call :Sanitizar "!TEMP_DIR!"
+
 pause >nul
 goto MostrarMenu
+
+rem ======================================================================================
+rem SUBRUTINA RENDERIZAR ARCHIVOS
+rem --------------------------------------------------------------------------------------
+rem Ficha CME - SR-REN-001
+rem Propósito: Renderizar los archivos .puml encontrados en un directorio.
+rem Entradas: %1 - El directorio de origen, %2 - El directorio de salida.
+rem --------------------------------------------------------------------------------------
+:RenderizarArchivos
+set "SOURCE_DIR=%1"
+set "OUTPUT_DIR=%2"
+for /r "%SOURCE_DIR%" %%f in (*.puml) do (
+    echo [INFO] Renderizando archivo %%~nxf...
+    java -jar "%~dp0plantuml.jar" -o "%OUTPUT_DIR%" "%%~f"
+    if errorlevel 1 (
+        call :ManejarError RENDER_FALLA
+    )
+)
+goto :EOF

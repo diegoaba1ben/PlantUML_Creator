@@ -1,11 +1,5 @@
 # **PlantUML_Creator**
 
-PlantUML_Creator es un script CLI desarrollado en .bat que automatiza la generación de diagramsa, figuras y tablas utilizando el lenguaje DSL (Domain-Specific-Lenguaje) de PlantUML. Un DSL es un lenguaje diseñado específicamente para describir elementos como dentro de un dominio concreto -en este caso, estructuras visuales
-como clases, secuencias, flujos o componentes de software- de forma concisa y expresiva
-Este artefacto resuelve la necesidad de renderizar diagramas sin depender de extensiones nativas como las de IntelliJ IDEA, permitiendo una ejecución directa desde consola, con validación de entorno, modularidad y trazabilidad
-
----
-
 ## **Autor:**
 
 Diego Benjumea - Redfyr
@@ -13,6 +7,12 @@ Diego Benjumea - Redfyr
 ## *Fecha:*
 
 2025-08-22
+
+PlantUML_Creator es un script CLI desarrollado en .bat que automatiza la generación de diagramas PlantUML apra mantener la documentación de software actualizada, figuras y tablas utilizando el lenguaje DSL (Domain-Specific-Lenguaje) de PlantUML. Un DSL es un lenguaje diseñado específicamente para describir elementos como dentro de un dominio concreto -en este caso, estructuras visuales
+como clases, secuencias, flujos o componentes de software- de forma concisa y expresiva
+Este artefacto resuelve la necesidad de renderizar diagramas sin depender de extensiones nativas como las de IntelliJ IDEA, permitiendo una ejecución directa desde consola, con validación de entorno, modularidad y trazabilidad
+
+---
 
 ## *Propósito Institucional*
 
@@ -34,7 +34,7 @@ Diego Benjumea - Redfyr
 
 ## *Características principales*
 
-- Renderizador CLI multiplataforma: Ejecuta diagrams desde consola sin dependeer de extensiones gráficas ni IDEs específicos
+- Renderizador CLI multiplataforma: Ejecuta diagramas desde consola sin depender de extensiones gráficas ni IDEs específicos
 - Uso de lenguaje DSL:  PlantUML emplea un Domain-Specif Lenguage para describir visualmente estructuras de software de forma concisa
 - Validación de entorno: Verifica la presencia de Java y PlantUML antes de ejecutar, evitando errores silenciosos
 - Modularidad defensiva: subrutinas independientes para sanitización, limpieza de temporales y control de logs
@@ -46,7 +46,8 @@ Diego Benjumea - Redfyr
 
 ### *Primario*
 
-- PowerShell 5.0 o superior
+- Windows 10 o superior
+- Batch 1.0 o superior
 - Java Runtime Environment instalado
 - plantuml.jar ubicado en el mismo directorio o accesible.
 
@@ -54,9 +55,8 @@ Diego Benjumea - Redfyr
 
 ### *Aclaración Institucional*
 
-Se evita PowerShell como entorno de ejecución debido a sus restricciones de seguridad (como la política AllSigned)
-que dificulta la instalación y distribución del script en equipos externos. El uso de CMD garantiza mayor
-compatibilidad y portabilidad sin comprometer la trazabilidad
+Se evita PowerShell como entorno de ejecución debido a sus restricciones de seguridad (como la política AllSigned) que dificulta la instalación y distribución del script en equipos externos. El uso de CMD
+garantiza mayor compatibilidad y portabilidad sin comprometer la trazabilidad
 
 ---
 
@@ -74,7 +74,18 @@ Proyecto PlantUML_Creator
 
 Defensivo, trazable y pedagógico
 
-### Ficha CME: Bloque de validación de entorno
+## **Ficha CME-MAIN-001**
+
+Este bloque de código es el punto de entrada de la aplicación. Se encargará de la configuración inical del entorno, define las dependencias del proyecto y la autoría y luego transfiere el control a los bloques de
+validación del entorno y los menús principales. Actúa como orquestador principal del flujo de trabajo,
+asegurando que todos los componentes se ejecuten en el orden correcto.
+
+### *Proósito*
+
+- Configuración del entorno: Prepara el entorno de ejecución, habilitando la expansión de variables para un control preciso del estado del script.
+- Gestión de flujo: Coordina la ejecucióon de las subrutinas, comenzando por las validaciones de las dependencias(ValidarEntorno) y luego redirige al usuario al menu principal(MostrarMenu)
+
+## **Ficha CME: Bloque de validación de entorno**
 
 - *ID:* CME-ENVVAL-001
 - *Nombre*: Validación del entorno en PlantUML_Creator.bat
@@ -117,7 +128,7 @@ un grupo específico de diagramas. El proceso es el siguiente:
 crear una subcarpeta con el nombre del prefijo dentro del directorio de salida (output/); esto evita que los
 diagramas de diferentes categorías se mezclen, manteniendo el proyecto muy organizado (por ejemplo: output/sec, output/net)
 - Listado y confirmación: Una vez el script ha encontrado los archivos, te muestra una lista de los que va a procesar, no los renderiza de inmediato, en cambio, pregunta si se desea continuar; esto da el control total para decidir si se quiere seguir adelante o cancelar la operación y volver al menú.
-Esta funcionalidad es ideal cuando se quiere actualizar un tipo específico de diagrama sin tener que esperar a que el script renderice todo el proyecto. Es una medida defensiva que ahhorra tiempo y recursos
+Esta funcionalidad es ideal cuando se quiere actualizar un tipo específico de diagrama sin tener que esperar a que el script renderice todo el proyecto. Es una medida defensiva que ahorra tiempo y recursos
 
 ### *Confirmación del usuario*
 
