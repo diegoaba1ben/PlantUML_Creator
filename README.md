@@ -1,138 +1,85 @@
-# **PlantUML_Creator**
+# **PlantUML-Creator**
 
-## **Autor:**
+## *Descripción*
 
-Diego Benjumea - Redfyr
+PlantUML-Creator es un script de línea de comandos diseñado para automatizar el proceso de renderizado de diagramas PlantUML. Este script está construido para entornos Windows y te permite generar diagramas .png a partir de archivos .puml de manera eficiente, ya sea procesando todos los archivos o filtrando por prefijos específicos.
 
-## *Fecha:*
+## *Características*
 
-2025-08-22
+- Menú Interactivo: Un menú simple y claro que te guía a través de las opciones de renderizado.
 
-PlantUML_Creator es un script CLI desarrollado en .bat que automatiza la generación de diagramas PlantUML apra mantener la documentación de software actualizada, figuras y tablas utilizando el lenguaje DSL (Domain-Specific-Lenguaje) de PlantUML. Un DSL es un lenguaje diseñado específicamente para describir elementos como dentro de un dominio concreto -en este caso, estructuras visuales
-como clases, secuencias, flujos o componentes de software- de forma concisa y expresiva
-Este artefacto resuelve la necesidad de renderizar diagramas sin depender de extensiones nativas como las de IntelliJ IDEA, permitiendo una ejecución directa desde consola, con validación de entorno, modularidad y trazabilidad
+- Validación de Entorno: Comprueba automáticamente la existencia de Java y plantuml.jar. Si no los encuentra, te ofrece enlaces directos de descarga.
 
----
+- Renderizado Completo: Opción para procesar todos los archivos .puml encontrados en el directorio Codigo.
 
-## *Propósito Institucional*
+- Filtrado por Prefijo: Un submenú dedicado para renderizar solo los archivos que coinciden con un prefijo predefinido (ej. sec_, net_, app_).
 
-- Formalizar el proceso de generación de diagramas como artefactos auditables
-- Facilitar la adopción de PlantUML en entornos donde no se dispone de IDEs con extensiones gráficas
-- Promover buenas prácticas defensivas en scripting, control de dependencias y limpieza de temporales
-- Alinear el uso del script con marcos normativos NIST, ISO/IEC y NICE.
+- Gestión de Archivos Temporales: Crea y elimina un directorio temporal para el proceso de filtrado, asegurando que tu entorno de trabajo se mantenga limpio.
 
----
+- Manejo Centralizado de Errores: Todos los mensajes de error se gestionan desde una única subrutina para facilitar la depuración y la trazabilidad.
 
-## *Público Objetivo*
+## *Prerrequisitos*
 
-- Arquitectos metodológicos que documentan sistemas con trazabilidad
-- Desarrolladores fullstack que integran diagramas en pipelines o documentación técnica
-- Analistas de ciberseguridad que quieren visualización estructurada de flujos o dependencias
-- Instituciones educativas que enseñan modelado con enfoque defensivo y reproducible
+Para que el script funcione correctamente, asegúrate de tener lo siguiente en tu sistema:
 
----
+Java Runtime Environment (JRE): El comando java debe ser accesible desde la línea de comandos. Esto se logra si Java está instalado y su ruta está incluida en la variable de entorno PATH del sistema.
 
-## *Características principales*
+plantuml.jar: El archivo ejecutable de PlantUML debe estar en el mismo directorio que el script creator.bat.
 
-- Renderizador CLI multiplataforma: Ejecuta diagramas desde consola sin depender de extensiones gráficas ni IDEs específicos
-- Uso de lenguaje DSL:  PlantUML emplea un Domain-Specif Lenguage para describir visualmente estructuras de software de forma concisa
-- Validación de entorno: Verifica la presencia de Java y PlantUML antes de ejecutar, evitando errores silenciosos
-- Modularidad defensiva: subrutinas independientes para sanitización, limpieza de temporales y control de logs
-- Trazabilidad: Cada componente puede formalizarse como artefacto con ficha, propósito y entorno definido
-- Exclusión de artefactos generados: .gitignore adaptado para mantener el repositorio limpio y auditable
-- Documentación pedagógica: Estructura para facilitar la adopción institucional o educativa
+## *Estructura del Proyecto*
 
-## **Entorno de ejecución**
+El proyecto sigue una estructura de directorios simple y organizada:
 
-### *Primario*
+.
+├── Codigo/
+│   ├── sec_diagrama_seguridad.puml
+│   └── net_diagrama_redes.puml
+├── output/
+│   ├── sec/
+│   │   └── sec_diagrama_seguridad.png
+│   └── net/
+│       └── net_diagrama_redes.png
+├── creator.bat
+└── plantuml.jar
 
-- Windows 10 o superior
-- Batch 1.0 o superior
-- Java Runtime Environment instalado
-- plantuml.jar ubicado en el mismo directorio o accesible.
+Codigo/: Directorio donde se almacenan todos los archivos de origen (.puml).
 
----
+output/: Directorio de salida donde se guardan los diagramas generados (.png).
 
-### *Aclaración Institucional*
+creator.bat: El script principal del proyecto.
 
-Se evita PowerShell como entorno de ejecución debido a sus restricciones de seguridad (como la política AllSigned) que dificulta la instalación y distribución del script en equipos externos. El uso de CMD
-garantiza mayor compatibilidad y portabilidad sin comprometer la trazabilidad
+plantuml.jar: El ejecutable de PlantUML.
 
----
+## *Uso*
 
-### *gitignore — Exclusión de artefactos generados*
+Simplemente haz doble clic en el archivo creator.bat o ejecútalo desde la línea de comandos. El script mostrará un menú interactivo.
 
-### Propósito CME
+Para renderizar todos los diagramas:
 
-Mantener la limpieza del repositorio, excluyendo archivos temporales, binarios y trazas que no forman parte del legado institucional
+- Selecciona la opción 1.
 
-### Contexto
+El script encontrará todos los archivos .puml y los procesará en el directorio output.
 
-Proyecto PlantUML_Creator
+Para renderizar por prefijo:
 
-### Enfoque
+- Selecciona la opción 2.
 
-Defensivo, trazable y pedagógico
+Elige el prefijo de la lista.
 
-## **Ficha CME-MAIN-001**
+El script creará un directorio temporal, moverá los archivos relevantes, los renderizará en una subcarpeta en output y luego limpiará el directorio temporal.
 
-Este bloque de código es el punto de entrada de la aplicación. Se encargará de la configuración inical del entorno, define las dependencias del proyecto y la autoría y luego transfiere el control a los bloques de
-validación del entorno y los menús principales. Actúa como orquestador principal del flujo de trabajo,
-asegurando que todos los componentes se ejecuten en el orden correcto.
+## *Historial de Versiones*
 
-### *Proósito*
+v1.0.007
 
-- Configuración del entorno: Prepara el entorno de ejecución, habilitando la expansión de variables para un control preciso del estado del script.
-- Gestión de flujo: Coordina la ejecucióon de las subrutinas, comenzando por las validaciones de las dependencias(ValidarEntorno) y luego redirige al usuario al menu principal(MostrarMenu)
+- Refactorización Completa: El código ha sido refactorizado para utilizar subrutinas modulares, mejorando la legibilidad y el mantenimiento.
 
-## **Ficha CME: Bloque de validación de entorno**
+- Parámetros Dinámicos: La subrutina :RenderizarArchivos ahora acepta parámetros de directorios, haciéndola reutilizable y más flexible.
 
-- *ID:* CME-ENVVAL-001
-- *Nombre*: Validación del entorno en PlantUML_Creator.bat
-- *Propósito*: Comprobar que Java está en el en PATH y plantuml.jar existe antes de ejecutar el resto del script para
-evitar errores silenciosos
-- *Alcance*: Se ejecuta al inicio de PlantUML_Creator.bat para comprobar el entorno y abortar si falta alguna dependencia
-- *Audiencia*: Usuarios y mantenedores del script que operan Windows CMD
-- *Contexto*: Fragmento de código batch insertado al comienzo del script para garantizar que las precondiciones estén cubiertas
-- *Formato*: Código batch (.bat) compatible con cmd.exe
-- *Estructura*: Comando Java- version > nul > 2&1 y comprobación de %ERRORLEVEL%; instrucción if not exist "plantuml.jar"
-- *Dependencias*: Consola CMD (cmd.exe), Java Runtime Environment accesible desde el PATH, archivo plantuml.jar
-- *Entradas*: Estado del entorno - Instalación de Java y existencia de plantuml.jar
-- *Salidas*: Mensajes claros de error o éxito, código de salida distintos de cero si faltan dependencias
-- *Mantenimiento*: Ajustar rutas o comandos según actualizaciones de Java/PlantUML, versionar junto al script
+- Lógica de Filtrado Mejorada: Se ha separado la lógica de filtrado de la de renderizado. El bucle for ahora está en la subrutina :FiltrarMenuEstatico.
 
----
+- Manejo de Errores Optimizado: Se añadió un manejo de errores más detallado para la creación de directorios y la sanitización de archivos temporales.
 
-### *Menú de opciones principales*
+## **Autoría y Licencia**
 
-Se crea un  menú que permite al usuario acceder a las opciones básicas que ofrece el script y escoger entre
-las opciones 1 para renderizar todos los activos y la opción 2  para filtrar y renderizar por prefijo o la opción 3 para salir del script.
-
-### *Gestión defensiva de archivos*
-
-Antes de cualquier acción, el script verifica la existencia de los archivos .puml en el directorio 'codigo',
-si no encuentra ninguno, muestra un mensaje informativo y finaliza el proceso para evitar errores.
-
-### *Listado de archivos (Opción 1)*
-
-Al elegir la opción 1 (renderizar todo) el script hace un escaneo y muestra una lista detallada de todos los archivos que va a procesar.
-
-### *Renderizado por prefijo (Opción 2)*
-
-Cuando se selecciona la opción 2, el script no procesa todos los archivos de golpe, sino que permite elegir
-un grupo específico de diagramas. El proceso es el siguiente:
-
-- Menú prefijos: El script presenta una lista de prefijos predefinidos, cada prefijo corrsponde a un tipo de diagrama como, como sec para seguridad o net para redes.
-- Selección y búsqueda: Elección de la opción. El escript toma el prefijo asociado (ej: sec) y luego escanea la carpeta 'codigo'/ para encontrar todos los archivos que comiencen con ese prefijo (ej_sec-001, sec-002)
-- Creación de la carpeta de salida: Antes de renderizar, el script es lo suficientemente inteligente para
-crear una subcarpeta con el nombre del prefijo dentro del directorio de salida (output/); esto evita que los
-diagramas de diferentes categorías se mezclen, manteniendo el proyecto muy organizado (por ejemplo: output/sec, output/net)
-- Listado y confirmación: Una vez el script ha encontrado los archivos, te muestra una lista de los que va a procesar, no los renderiza de inmediato, en cambio, pregunta si se desea continuar; esto da el control total para decidir si se quiere seguir adelante o cancelar la operación y volver al menú.
-Esta funcionalidad es ideal cuando se quiere actualizar un tipo específico de diagrama sin tener que esperar a que el script renderice todo el proyecto. Es una medida defensiva que ahorra tiempo y recursos
-
-### *Confirmación del usuario*
-
-En ambas opciones (1 y 2), el script pide una confirmación antes de iniciar el renderizado, lo que da control
-total sobre el acceso.
-
-## Instalación (pendiente de desarrollo)
+Este script ha sido creado y desarrollado por Diego Benjumea - Redfyr. Se recomienda su uso para la gestión y automatización de diagramas PlantUML en proyectos
