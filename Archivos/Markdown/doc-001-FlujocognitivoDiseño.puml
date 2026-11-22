@@ -1,0 +1,54 @@
+@startuml
+
+' ---CONFIGURACIÓN DEL LIENZO ---
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+title Entorno de Diseño Arquitectónico Asistido por IA\nEgidaCP Platform (doc-001 refinado)
+
+' --- COMPONENTES DEL DIAGRAMA ---
+actor "Arquitecto del Sistema\nAutoridad de Decisión" as ARCH #lightblue
+
+package "IA de razonamiento principal" {
+    component "IA principal\nContexto acumulado del proyecto\n(razonamiento)" as MAINAI
+}
+
+package "IA de contraste arquitectónico" {
+    component "Segunda voz especializada\npara análisis crítico\n(validación)" as SECONDAI
+}
+
+package "IA ejecutora documental" {
+    component "Ejecutor de modificaciones\nsobre artefactos del proyecto\n(ejecución)" as EXEC
+}
+
+package "IA de consulta local" {
+    component "Consultas rápidas y privadas\nsin acceso externo\n(utilidades)" as LOCALAI
+}
+
+package "Artefactos del Proyecto" {
+    file "FBCA\nMemoria del proyecto" as FBCA
+    file "DDS\nDocumentación arquitectónica" as DDS
+    file "Modelos visuales" as DSL
+    file "Historial de Cambios\n(Contexto persistente)" as HISTORY
+}
+
+ARCH --> MAINAI : interacción principal
+ARCH --> SECONDAI : validación arquitectónica
+ARCH --> LOCALAI : consultas rápidas
+
+MAINAI <--> SECONDAI : contraste de análisis
+
+ARCH --> EXEC : aplicar cambios\ncuando se aprueban decisiones
+
+EXEC --> FBCA
+EXEC --> DDS
+EXEC --> DSL
+EXEC --> HISTORY : registrar cambios
+
+FBCA --> MAINAI
+FBCA --> SECONDAI
+
+EXEC --> ARCH : notificación de ejecución\n(confirmación de cambios)
+
+@enduml

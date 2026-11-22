@@ -1,0 +1,46 @@
+@startuml
+ 
+title Flujo cognitivo: Proceso SDD + IA + HITL 
+
+' --- CONFIGURACIÓN ---
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false 
+skinparam default FontName Arial
+
+' --- ELEMENTOS DEL FLUJO ---
+actor "Arquitecto / Desarrollador" as DEV #ADD8E6
+
+rectangle "Preguntas fundacionales" as PF #99f5f0
+rectangle "Transformación cognitiva" as TC #65bbb7 {
+    [Proceso de abstracción] as PA
+    [Proceso de concresión] as PC
+}
+
+rectangle "Solución implementable" as SI #2a9993
+
+' --- RELACIONES ---
+DEV --> PF : Necesidad o problema\nencontrado
+PF --> PA : Ingreso al Flujo cognitivo
+PA <--> PC : Soporte cognitivo (SDD + IA + HITL)
+PC --> SI : Materialización de la solución
+
+' --- NOTAS ---
+note right of PF 
+    ¿qué necesito?, ¿para qué lo necesito?
+    ¿qué hago primero? etc.
+end note
+
+note right of PA
+    Modelo, arquitectura diseño
+end note
+
+note right of PC
+    Implementación, código, artefactos
+end note
+
+note right of SI
+    Producto final
+end note
+
+@enduml

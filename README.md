@@ -96,4 +96,4 @@ v1.0.007
 
 ## **Autoría y Licencia**
 
-Este script ha sido creado y desarrollado por Diego Benjumea - Redfyr. Se recomienda su uso para la gestión y automatización de diagramas PlantUML en proyectos
+Este script ha sido creado y desarrollado por Diego Benjumea - EgidaCD. Se recomienda su uso para la gestión y automatización de diagramas PlantUML en proyectos

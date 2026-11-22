@@ -1,0 +1,115 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+title arq-001\nEntorno Gobernado de Diseño con IA\nEgidaCP Platform
+
+actor "ARCH\nArquitecto del Sistema\nAutoridad de Control" as ARCH #lightblue
+
+' =========================
+' CAPA 01 — VERDAD
+' =========================
+package "01-TRUTH" {
+    file "DDS\nInvariantes Arquitectónicos" as DDS
+}
+
+' =========================
+' CAPA 02 — MODELO
+' =========================
+package "02-MODEL" {
+    component "MODEL\nEstados + Temporalidad + Lifecycle" as MODEL #lightcyan
+}
+
+' =========================
+' CAPA 03 — INTERFAZ OPERATIVA
+' =========================
+package "03-OPERATIONAL-INTERFACE" {
+    component "SDD\nOrquestación Operativa de IA" as SDD #lightyellow
+}
+
+' =========================
+' CAPA 04 — AGENTES
+' =========================
+package "04-AGENTS" {
+    component "MAINAI\nIA Principal (Generación)" as MAINAI #lightyellow
+    component "SECONDAI\nIA de Contraste (Validación)" as SECONDAI #lightpink
+    component "EXEC\nEjecutor Controlado" as EXEC #lightgreen
+}
+
+' =========================
+' CAPA 05 — GOBERNANZA
+' =========================
+package "05-GOVERNANCE" {
+    component "FILTER\nPunto de Control Absoluto" as FILTER #orange
+    component "PATCH\nMecanismo de Cambio Formal" as PATCH #lightgray
+}
+
+' =========================
+' CAPA 06 — MEMORIA
+' =========================
+package "06-MEMORY" {
+    database "ENGRAM\nMemoria Persistente Validada" as ENGRAM
+}
+
+' =========================
+' RELACIONES
+' =========================
+
+' Interacción humana
+ARCH --> MAINAI : interacción
+ARCH --> SECONDAI : validación
+ARCH --> FILTER : aprobación final
+
+' Relación entre agentes
+MAINAI <--> SECONDAI : contraste
+
+' SDD como orquestador
+MAINAI --> SDD : consulta / restricción
+SECONDAI --> SDD : reglas de validación
+SDD --> MAINAI : constriñe comportamiento
+SDD --> SECONDAI : constriñe validación
+
+' Modelo como base semántica
+SDD --> MODEL : referencia semántica
+MAINAI --> MODEL : interpretación
+SECONDAI --> MODEL : validación lógica
+
+' Flujo de gobernanza
+MAINAI --> FILTER : propuesta
+SECONDAI --> FILTER : validación
+
+FILTER --> ENGRAM : persistencia autorizada
+FILTER --> PATCH : instrucción de cambio
+
+' Ejecución controlada
+FILTER --> EXEC : instrucción de ejecución
+EXEC --> DDS : aplicación controlada
+
+' Evolución estructural
+PATCH --> MODEL : actualización semántica (si aplica)
+PATCH --> DDS : actualización normativa
+
+' =========================
+' NOTAS
+' =========================
+
+note top of FILTER
+Invariante:
+Nada se persiste ni se modifica
+sin pasar por este punto
+end note
+
+note top of MODEL
+Fuente de verdad semántica:
+Define estados, temporalidad
+y lifecycle del sistema
+end note
+
+note top of SDD
+No es memoria
+Es interfaz operativa
+y orquestador de comportamiento
+end note
+
+@enduml

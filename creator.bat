@@ -58,7 +58,7 @@ if not exist "%PLANTUML_JAR%" (
 )
 
 echo [✓] Entorno validado correctamente.
-goto :EOF
+exit /b 0
 
 :OfrecerInstalacionJava
 echo ¿Deseas instalar Java? (S/N)
@@ -108,7 +108,7 @@ if "%OPCION%"=="1" (
 ) else (
     echo [ERROR] Opcion invalida. Intentalo de nuevo.
     pause >nul
-    goto MostrarMenu
+    goto :MostrarMenu
 )
 goto :EOF
 
@@ -120,6 +120,7 @@ rem Propósito: Recuperar la lista de archivos *.puml desde el directorio Codigo
 rem --------------------------------------------------------------------------------------
 :ObtenerArchivos
 set "DIR_CODIGO=%~dp0Codigo"
+
 if not exist "%DIR_CODIGO%" (
     call :ManejarError DIR_CODIGO_FALTA
     goto :EOF
@@ -139,6 +140,8 @@ echo.
 echo [INFO] Se encontraron los siguientes archivos para renderizar:
 for %%f in (%archivos_a_procesar%) do echo   - %%~nxf
 
+rem set "archivos_a_procesar=%archivos_a_procesar:~0,~1%"
+
 goto :EOF
 
 rem ======================================================================================
@@ -150,9 +153,11 @@ rem ----------------------------------------------------------------------------
 :RenderizarArchivos
 set "OUTPUT=%~dp0output"
 if not exist "%OUTPUT%" mkdir "%OUTPUT%"
+
 for %%f in (%archivos_a_procesar%) do (
     echo [INFO] Renderizando archivo %%~nxf...
-    java -jar "%~dp0plantuml.jar" -o "%OUTPUT%" "%%~f"
+
+    java -jar "%~dp0plantuml.jar" -o "%OUTPUT%" %%f
     if errorlevel 1 (
         call :ManejarError RENDER_FALLA
     )
@@ -177,14 +182,22 @@ echo [INFO] Buscando archivos nuevos o modificados para renderizar...
 set "archivos_a_procesar="
 for /r "%DIR_CODIGO%" %%f in (*.puml) do (
     set "ARCHIVO_PUML=%%f"
-    set "ARCHIVO_PNG=!DIR_SALIDA!\%%%%~nf.png"
-    if not exist "!ARVHIVO_PNG!" (
+    set "ARCHIVO_PNG=!OUTPUT!\%%~nf.png"
+    if not exist "!ARCHIVO_PNG!" (
         rem El archivo .png no existe, renderizar.
         set "archivos_a_procesar=!archivos_a_procesar! "!ARCHIVO_PUML!""
     ) else (
         rem El archivo .png ya existe, comparar fechas.
-        for /f "tokens=1" %%a in ('wmic datafile where name^="!ARCHIVO_PUML:^=\\!" get LastModified /format:list') do set "fecha_puml=%%a"
-        for /f "tokens=1" %%b in ('wmic datafile where name^="!ARCHIVO_PNG:^=\\!" get LastModified /format:list') do set "fecha_png=%%b"
+        rem for /f "tokens=1" %%a in ('wmic datafile where name^="!ARCHIVO_PUML:^=\\!" get LastModified /format:list') do set "fecha_puml=%%a" Eliminado progresivamente de Windows 11
+        rem for /f "tokens=1" %%b in ('wmic datafile where name^="!ARCHIVO_PNG:^=\\!" get LastModified /format:list') do set "fecha_png=%%b" Se usa PowerShell para obtener fechas de modificación
+
+        for /f "usebackq delims=" %%a in (
+        `powershell -NoProfile -Command "(Get-Item '!ARCHIVO_PUML!').LastWriteTime.ToFileTimeUtc()"`
+        ) do set "fecha_puml=%%a"
+
+        for /f "usebackq delims=" %%b in (
+        `powershell -NoProfile -Command "(Get-Item '!ARCHIVO_PNG!').LastWriteTime.ToFileTimeUtc()"`
+        ) do set "fecha_png=%%b"
         
         if "!fecha_puml!" GTR "!fecha_png!" (
             rem El archivo .puml es más reciente, renderizar.
@@ -207,7 +220,7 @@ if not defined archivos_a_procesar(
     )
 )
 pause >nul
-goto MostrarMenu
+goto :MostrarMenu
 
 rem ======================================================================================
 rem = SUBRUTINA: MANEJO DE ERRORES                                                    =
@@ -232,7 +245,6 @@ if "%~1"=="ARG_FALTA" (
 ) else if "%~1"=="DIR_CODIGO_FALTA" (
     echo [ERROR] No se encontro el directorio 'Codigo'.
 )
-endlocal
 exit /b 1
 
 rem ======================================================================================
@@ -244,7 +256,7 @@ rem            permitiendo al usuario seleccionar y renderizar solo los archivos
 rem            prefijo elegido.
 rem Entorno: Windows cmd, ejecución local.
 rem Dependencias: Subrutinas :RenderizarArchivos, :ManejarError.
-rem Autor: Diego Benjumea - Redfyr
+rem Autor: Diego Benjumea - EgidaCD
 rem Fecha: 2025-08-23
 rem =====================================================================================
 :FiltrarMenuEstatico
@@ -289,32 +301,37 @@ if "%OPCION%"=="11" (set "SEL_PREF=cfg")
 if not defined SEL_PREF (
     echo [ERROR] Opcion invalida. Intentalo de nuevo.
     pause >nul
-    goto FiltrarMenuEstatico
+    goto :FiltrarMenuEstatico
 )
 
 echo.
 echo [INFO] Has seleccionado el prefijo: !SEL_PREF!.
 
-set "archivos_a_procesar="
-set "archivos_no_movidos="
+rem=======================================================
+rem BLOQUE TEMPORALMENTE DESHABILITADO
+rem Motivo: Revisar si el uso de TEMP_DIR es necesario.
+rem ctualmente los arlhivos suelen estar organizados por dominio/prefijo
+rem Fecha revisión: 2026-11-22
+REM=======================================================
+rem set "archivos_a_procesar="
+rem set "archivos_no_movidos="
 rem --- Mueve los archivos a una carpeta temporal
-set "TEMP_DIR=%~dp0temp\temp_!SEL_PREF!_!DATE!_!TIME: =_!"
+rem set "TEMP_DIR=%~dp0temp\temp_!SEL_PREF!_!DATE!_!TIME: =_!"
 rem Reemplazamos los caracteres especiales para un nombre de carpeta valido
-set "TEMP_DIR=!TEMP_DIR:/=-!"
-set "TEMP_DIR=!TEMP_DIR::=-!"
-set "TEMP_DIR=!TEMP_DIR:,=-!"
-mkdir "!TEMP_DIR!"
-
+rem set "TEMP_DIR=!TEMP_DIR:/=-!"
+rem set "TEMP_DIR=!TEMP_DIR::=-!"
+rem set "TEMP_DIR=!TEMP_DIR:,=-!"
+rem mkdir "!TEMP_DIR!"
 rem --- Mover archivos a la carpeta temporal ---
-for /r "%~dp0Codigo" %%f in (!SEL_PREF!_*.puml) do (
-    move "%%f" "!TEMP_DIR!"
-    if errorlevel 1 (
-        echo [ERROR] No se pudo mover el archivo "%%f".
-        set "archivos_no_movidos=true"
-    ) else (
-        set "archivos_a_procesar=!archivos_a_procesar! "!TEMP_DIR!\%%~nxf""
-    )
-)
+rem for /r "%~dp0Codigo" %%f in (!SEL_PREF!_*.puml) do (
+rem     move "%%f" "!TEMP_DIR!"
+rem     if errorlevel 1 (
+rem         echo [ERROR] No se pudo mover el archivo "%%f".
+rem         set "archivos_no_movidos=true"
+rem     ) else (
+rem         set "archivos_a_procesar=!archivos_a_procesar! "!TEMP_DIR!\%%~nxf""
+rem     )
+rem )
 
 if defined archivos_a_procesar (
     echo.
@@ -327,11 +344,11 @@ if defined archivos_a_procesar (
         set "OUTPUT_SUBDIR=%~dp0output\!SEL_PREF!"
         if not exist "%OUTPUT_SUBDIR%" mkdir "%OUTPUT_SUBDIR%"
         
-        call :RenderizarArchivos "!TEMP_DIR!" "!OUTPUT_SUBDIR!"
+        call :RenderizarDirectorio "!TEMP_DIR!" "!OUTPUT_SUBDIR!"
     ) else (
         echo [INFO] Operacion cancelada por el usuario.
         pause >nul
-        goto MostrarMenu
+        goto :MostrarMenu
     )
 ) else (
     echo.
@@ -342,7 +359,7 @@ rem --- Llamada a la subrutina de sanitización para limpiar el temporal ---
 call :Sanitizar "!TEMP_DIR!"
 
 pause >nul
-goto MostrarMenu
+goto :MostrarMenu
 
 rem ======================================================================================
 rem SUBRUTINA RENDERIZAR ARCHIVOS
@@ -351,7 +368,7 @@ rem Ficha CME - SR-REN-001
 rem Propósito: Renderizar los archivos .puml encontrados en un directorio.
 rem Entradas: %1 - El directorio de origen, %2 - El directorio de salida.
 rem --------------------------------------------------------------------------------------
-:RenderizarArchivos
+:RenderizarDirectorio
 set "SOURCE_DIR=%1"
 set "OUTPUT_DIR=%2"
 for /r "%SOURCE_DIR%" %%f in (*.puml) do (

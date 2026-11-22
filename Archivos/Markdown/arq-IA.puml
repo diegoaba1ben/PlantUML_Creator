@@ -1,0 +1,65 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+
+title Sistema de Agentes - Spec Driven Development\nBasado en la charla de Alan Buscaglia
+
+actor "Tú\n(Arquitecto)" as DEV #lightblue
+
+package "Documentación / Spec" {
+    file "DDS\n(en inglés)" as DDS
+    file "Archivos .puml\n(PlantUML)" as PUML
+}
+
+package "AGENTS.md\n(Cerebro del Sistema)" {
+    component "Skills Registry\n(Catálogo indexado)" as REGISTRY
+    component "Router\n(Despachador)" as ROUTER
+}
+
+package "Agentes Especializados" {
+    component "Agente 1\nBackend / Lógica" as AG1 #lightyellow
+    component "Agente 2\nFrontend / UI" as AG2 #lightyellow
+    component "Agente N\n(skill bajo demanda)" as AGN #lightyellow
+}
+
+package "Herramientas MCP" {
+    component "Context7\n(Documentación actual)" as C7 #lightgreen
+    component "Engram\n(Memoria persistente)" as ENG #lightgreen
+    component "Jira\n(Gestión de tareas)" as JIRA #lightgreen
+}
+
+DEV --> DDS : define y escribe
+DEV --> PUML : genera y guarda
+DDS --> ROUTER : alimenta contexto
+PUML --> ROUTER : estructura técnica
+
+ROUTER --> REGISTRY : consulta\n¿quién puede hacer esto?
+REGISTRY --> ROUTER : responde\ncon skill correcta
+
+ROUTER --> AG1 : activa solo\nsi se necesita
+ROUTER --> AG2 : activa solo\nsi se necesita
+ROUTER --> AGN : activa solo\nsi se necesita
+
+AG1 --> C7 : consulta docs\nactualizadas
+AG2 --> C7 : consulta docs\nactualizadas
+AG1 --> ENG : guarda/recupera\ncontexto
+AG2 --> ENG : guarda/recupera\ncontexto
+AG1 --> JIRA : registra\nprogreso
+AG2 --> JIRA : registra\nprogreso
+
+note right of REGISTRY
+  Cada skill indexada:
+  - Dormida hasta ser llamada
+  - Se activa solo cuando\n  el sistema lo requiere
+  - No consume tokens\n  en espera
+end note
+
+note right of DEV
+  Tu rol:
+  - Escribir specs claras
+  - Validar outputs
+  - Tomar decisiones\n  de arquitectura
+end note
+
+@enduml

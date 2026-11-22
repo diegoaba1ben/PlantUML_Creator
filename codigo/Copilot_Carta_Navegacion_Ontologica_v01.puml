@@ -1,0 +1,31 @@
+@startuml
+
+object Copropiedad
+
+object "Bienes" as Bienes
+object "Administracion" as Administracion
+object "Personas" as Personas
+
+object "Actores Externos" as ActoresExternos
+object "Autoridades" as Autoridades
+object "Documentos" as Documentos
+
+object "Finanzas" as Finanzas
+object "Operacion" as Operacion
+object "Seguridad" as Seguridad
+object "Contratos" as Contratos
+
+Copropiedad -- Bienes
+Copropiedad -- Administracion
+Copropiedad -- Personas
+
+Copropiedad -- ActoresExternos
+Copropiedad -- Autoridades
+Copropiedad -- Documentos
+
+Copropiedad -- Finanzas
+Copropiedad -- Operacion
+Copropiedad -- Seguridad
+Copropiedad -- Contratos
+
+@enduml
